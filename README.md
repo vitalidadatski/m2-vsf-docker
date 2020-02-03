@@ -2,9 +2,9 @@ Docker Devbox for Magento 2
 
 # Software stack
 - Nginx (stable)
-- php-fpm (7.2)
-- MySql (percona 5.7)
-- ElasticSearch (6.*)
+- php-fpm (7.3)
+- MySql (MariaDB 10.2)
+- ElasticSearch (5.*,6.*)
 - Redis (5.*)
 - Varnish (4.*)
 
