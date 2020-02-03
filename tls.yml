@@ -1,0 +1,13 @@
+version: "3.4"
+
+services:
+  tls:
+    image: 'magento/magento-cloud-docker-tls:latest'
+    ports:
+      - '443:443'
+    external_links:
+      - 'varnish:varnish'
+    depends_on:
+      - varnish
+    networks:
+      - mage

@@ -1,0 +1,25 @@
+
+version: "3.4"
+
+services:
+  php7-fpm:
+    volumes:
+      - ${PWD}/build/elasticsearch/scripts/post-elastic5.sh:/docker/scripts/post-elastic.sh
+
+  elasticsearch:
+    build:
+      context: ./build/elasticsearch
+      dockerfile: Dockerfile5
+    volumes:
+      - ./build/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    environment:
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+    networks:
+      - mage
+
+volumes:
+  esdata:

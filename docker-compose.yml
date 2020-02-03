@@ -1,0 +1,78 @@
+version: "3.4"
+
+services:
+  php7-fpm:
+    build:
+      context: ./build/php7-fpm
+    volumes:
+      - magento2-root:${MAGENTO_ROOT:-/var/www/magento2}:nocopy
+      - ~/.ssh:/tmp/.ssh:ro
+      - './build/php7-fpm/php/magento.ini:/usr/local/etc/php/conf.d/magento.ini'
+    working_dir:
+      ${MAGENTO_ROOT:-/var/www/magento2}
+    environment:
+      - PERFORM_INSTALLATION=${PERFORM_INSTALLATION}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-magento2}
+      - MYSQL_USER=${MYSQL_USER:-dbuser}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-admin}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+      - APPLICATION_PROTOCOL=${APPLICATION_PROTOCOL:-http://}
+      - APPLICATION_DOMAIN=${MAGENTO_HOST:-magento2.loc}
+      - MAGENTO_ROOT=${MAGENTO_ROOT:-/var/www/magento2}
+      - MAGENTO_MODE=${MAGENTO_MODE:-developer}
+      - MAGENTO_ADMIN_USERNAME=${MAGENTO_ADMIN_USERNAME:-admin}
+      - MAGENTO_ADMIN_PASSWORD=${MAGENTO_ADMIN_PASSWORD:-adminqwe123}
+      - MAGENTO_ADMIN_EMAIL=${MAGENTO_ADMIN_EMAIL:-user@example.com}
+      - MAGENTO_ADMIN_FIRSTNAME=${MAGENTO_ADMIN_FIRSTNAME:-Magento}
+      - MAGENTO_ADMIN_LASTNAME=${MAGENTO_ADMIN_LASTNAME:-User}
+      - MAGE_COMPOSER_STABILITY=${MAGE_COMPOSER_STABILITY:-stable}
+      - COMPOSER_MAGENTO_USERNAME=${COMPOSER_MAGENTO_USERNAME}
+      - COMPOSER_MAGENTO_PASSWORD=${COMPOSER_MAGENTO_PASSWORD}
+      - COMPOSER_VAIMO_USERNAME=${COMPOSER_VAIMO_USERNAME}
+      - COMPOSER_VAIMO_PASSWORD=${COMPOSER_VAIMO_PASSWORD}
+      - VAIMO_API_USERNAME=${VAIMO_API_USERNAME}
+      - VAIMO_API_PASSWORD=${VAIMO_API_PASSWORD}
+    restart: always
+    depends_on:
+      - mysql
+    networks:
+      - mage
+
+  nginx:
+    build:
+      context: ./build/nginx
+    environment:
+      - MAGE_ROOT=${MAGENTO_ROOT:-/var/www/magento2}
+      - MAGE_HOST=${MAGENTO_HOST:-magento2.loc}
+      - MAGE_MODE=${MAGENTO_MODE:-developer}
+    volumes:
+      - magento2-root:${MAGENTO_ROOT:-/var/www/magento2}:nocopy
+    ports:
+      - 80:80 #comment out it for Varnish use
+      # - 8080:80 #comment in it for Varnish use
+    depends_on:
+      - php7-fpm
+    networks:
+      - mage
+
+  mysql:
+    image: 'mariadb:10.2'
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-magento2}
+      - MYSQL_USER=${MYSQL_USER:-dbuser}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-admin}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+    ports:
+      - 3307:3306
+    networks:
+      - mage
+
+volumes:
+  magento2-root:
+    external: true
+  mysql:
+
+networks:
+  mage:

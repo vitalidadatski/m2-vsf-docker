@@ -1,0 +1,65 @@
+version: "3.4"
+services:
+  frontend:
+    # image: divante/vue-storefront:latest
+    build:
+      context: ./src/vue-storefront
+      dockerfile: ./docker/vue-storefront/Dockerfile
+    env_file: ./src/vue-storefront/docker/vue-storefront/default.env
+    environment:
+      VS_ENV: dev
+    volumes:
+      - './src/vue-storefront/babel.config.js:/var/www/babel.config.js'
+      - './src/vue-storefront/config:/var/www/config'
+      - './src/vue-storefront/core:/var/www/core'
+      - './src/vue-storefront/ecosystem.json:/var/www/ecosystem.json'
+      - './src/vue-storefront/.eslintignore:/var/www/.eslintignore'
+      - './src/vue-storefront/.eslintrc.js:/var/www/.eslintrc.js'
+      - './src/vue-storefront/lerna.json:/var/www/lerna.json'
+      - './src/vue-storefront/tsconfig.json:/var/www/tsconfig.json'
+      - './src/vue-storefront/tsconfig-build.json:/var/www/tsconfig-build.json'
+      - './src/vue-storefront/shims.d.ts:/var/www/shims.d.ts'
+      - './src/vue-storefront/package.json:/var/www/package.json'
+      - './src/vue-storefront/src:/var/www/src'
+      - './src/vue-storefront/var:/var/www/var'
+    tmpfs:
+      - /var/www/dist
+    ports:
+      - '3000:3000'
+    networks:
+      - mage
+
+  frontend-api:
+    # image: divante/vue-storefront-api:latest
+    build:
+      context: ./src/vue-storefront-api
+      dockerfile: ./docker/vue-storefront-api/Dockerfile
+    depends_on:
+      - elasticsearch
+      - redis
+    env_file: ./src/vue-storefront-api/docker/vue-storefront-api/default.env
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 3
+      VS_ENV: dev
+    volumes:
+      - './src/vue-storefront-api/config:/var/www/config'
+      - './src/vue-storefront-api/ecosystem.json:/var/www/ecosystem.json'
+      - './src/vue-storefront-api/migrations:/var/www/migrations'
+      - './src/vue-storefront-api/package.json:/var/www/package.json'
+      - './src/vue-storefront-api/babel.config.js:/var/www/babel.config.js'
+      - './src/vue-storefront-api/tsconfig.json:/var/www/tsconfig.json'
+      - './src/vue-storefront-api/nodemon.json:/var/www/nodemon.json'
+      - './src/vue-storefront-api/scripts:/var/www/scripts'
+      - './src/vue-storefront-api/src:/var/www/src'
+      - './src/vue-storefront-api/var:/var/www/var'
+    tmpfs:
+      - /var/www/dist
+    ports:
+      - '8080:8080'
+    networks:
+      - mage
+
+networks:
+  mage:

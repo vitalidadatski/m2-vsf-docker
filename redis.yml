@@ -1,0 +1,15 @@
+version: "3.4"
+
+services:
+  php7-fpm:
+    volumes:
+      - ${PWD}/build/redis/scripts/post-redis.sh:/docker/scripts/post-redis.sh
+    depends_on: 
+      - redis
+
+  redis:
+    image: "redis:5-alpine"
+    ports:
+      - '6379:6379'
+    networks:
+      - mage

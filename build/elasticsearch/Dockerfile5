@@ -1,0 +1,6 @@
+FROM docker.elastic.co/elasticsearch/elasticsearch:5.6.11
+
+# Maintainer
+LABEL mainteiner=maksym.medynskyi@vaimo.com
+
+RUN bin/elasticsearch-plugin remove x-pack --purge

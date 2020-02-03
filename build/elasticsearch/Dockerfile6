@@ -1,0 +1,9 @@
+FROM docker.elastic.co/elasticsearch/elasticsearch:6.8.5
+
+# Maintainer
+LABEL mainteiner=maksym.medynskyi@vaimo.com
+
+# RUN elasticsearch-plugin remove x-pack --purge
+
+RUN  elasticsearch-plugin install --batch analysis-phonetic
+RUN  elasticsearch-plugin install --batch analysis-icu
